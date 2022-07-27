@@ -1,17 +1,11 @@
 require("dotenv").config();
-
-const createMovie = require("./services/movie/create");
 const connectMovieDB = require("./database/connectMoviesDB");
+const movieRoute = require("./routes/movies");
+const express = require('express');
 
-const mongoDBCred = {
-  un: process.env.MONGO_USERNAME,
-  pwd: process.env.MONGO_PASSWORD,
-};
+const PORT = 3001;
 
-const mongoDBUrl = `mongodb+srv://${mongoDBCred.un}:${mongoDBCred.pwd}@movieinterview.iwbmkkr.mongodb.net/?retryWrites=true&w=majority`;
-
-// services
-
+// connecting to DB
 (() => {
   try {
     connectMovieDB();
@@ -19,3 +13,16 @@ const mongoDBUrl = `mongodb+srv://${mongoDBCred.un}:${mongoDBCred.pwd}@movieinte
     console.log(exception);
   }
 })();
+
+const app = express();
+
+app.use("/movie", movieRoute);
+
+app.use((err, req, res, next) => {
+  // logic
+  console.log(err);
+});
+
+app.listen(PORT, () => {
+  console.log(`Server Started at ${PORT}`);
+});
