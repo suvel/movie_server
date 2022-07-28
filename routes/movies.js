@@ -37,11 +37,24 @@ router.delete("/delete/:id", (req, res, next) => {
   deleteExistingMovie(req, res, next);
 });
 
+/**
+ * route: movie/update/<id>
+ * method:PUT
+ * param: param
+ * required param: id
+ * desc: get list of all movies
+ */
+
+router.put("/update/:id", (req, res, next) => {
+  console.log("in movie/update");
+  updateExistingMovie(req, res, next);
+});
+
 const readMovies = require("../services/movie/read");
 async function fetchAndReposeWitMovieList(req, res, next) {
   try {
     const movieList = await readMovies();
-    res.status(202).send({ data: movieList });
+    res.status(200).send({ data: movieList });
   } catch (err) {
     console.log(err);
     next({ code: 500, msg: "Error while reading movies" });
@@ -59,7 +72,7 @@ async function crateNewMovie(req, res, next) {
     if (validations.length > 0) throw { code: 402, msg: validations.join(",") };
     const { movieName, rating, cast, releaseDate } = movieAttributes;
     await createMovies(movieName, rating, cast, releaseDate);
-    res.status(200).send({ msg: "Successfully added" });
+    res.status(201).send({ msg: "Successfully added" });
   } catch (err) {
     console.log(err);
     if (err?.code) {
@@ -78,7 +91,7 @@ async function deleteExistingMovie(req, res, next) {
     if (isDeleted) {
       res.status(200).send();
     } else {
-      res.status(204);
+      res.status(202);
     }
   } catch (err) {
     console.log(err);
@@ -88,5 +101,38 @@ async function deleteExistingMovie(req, res, next) {
     next({ code: 500, msg: "Error while creating movie" });
   }
 }
+
+const updateMovie = require("../services/movie/update");
+async function updateExistingMovie(req, res, next) {
+  try {
+    const id = req.params.id;
+    const movieAttributes = req.body;
+    if (!id) throw { code: 402, msg: "id is required" };
+    const responseMovie = await updateMovie(id, movieAttributes);
+    if (responseMovie === null) {
+      res.status(202).send();
+    } else {
+      console.log({ responseMovie });
+      const updMovie = getUpdatedMovie(responseMovie, movieAttributes);
+      res.status(200).send(updMovie);
+    }
+  } catch (err) {
+    console.log(err);
+    if (err?.code) {
+      next(err);
+    }
+    next({ code: 500, msg: "Error while updating movie" });
+  }
+}
+
+const getUpdatedMovie = (movieObject) => {
+  console.log(movieObject);
+  return {
+    movieName: movieObject.movieName,
+    rating: movieObject.rating,
+    cast: movieObject.cast,
+    releaseDate: movieObject.releaseDate,
+  };
+};
 
 module.exports = router;
