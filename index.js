@@ -31,6 +31,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(process.env.port || PORT, () => {
-  console.log(`Server Started at ${process.env.port || PORT}`);
+app.listen(process.env.PORT || PORT, () => {
+  console.log(`Server Started at ${process.env.PORT || PORT}`);
 });
