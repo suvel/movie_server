@@ -43,12 +43,13 @@ async function crateNewMovie(req, res, next) {
   try {
     const validations = validateRequiredMovieArguments(movieAttributes);
     if (validations.length > 0) throw { code: 402, msg: validations.join(",") };
-    await createMovies();
+    const {movieName, rating, cast, releaseDate} = movieAttributes;
+    await createMovies(movieName, rating, cast, releaseDate);
     res.status(200).send({ msg: "Successfully added" });
-  } catch (error) {
+  } catch (err) {
     console.log(err);
-    if (error?.code) {
-      next(error);
+    if (err?.code) {
+      next(err);
     }
     next({ code: 500, msg: "Error while creating movie" });
   }
