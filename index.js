@@ -1,7 +1,8 @@
 require("dotenv").config();
 const connectMovieDB = require("./database/connectMoviesDB");
 const movieRoute = require("./routes/movies");
-const express = require('express');
+const express = require("express");
+const cors = require("cors");
 
 const PORT = 3001;
 
@@ -16,11 +17,18 @@ const PORT = 3001;
 
 const app = express();
 
+app.use(cors());
+app.use(express.json());
+
+app.use(express.json());
+
 app.use("/movie", movieRoute);
 
+//error handler
 app.use((err, req, res, next) => {
-  // logic
-  console.log(err);
+  res.status(err.code).send({
+    errorMessage: err.msg,
+  });
 });
 
 app.listen(PORT, () => {

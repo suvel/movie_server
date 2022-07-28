@@ -12,7 +12,7 @@ const create = (movieName, rating, cast, releaseDate) => {
     newMovie.save().then(
       () => {
         console.log("successfully movie added...");
-        resolve(true);
+        resolve();
       },
       (err) => {
         console.log("exception wile adding movie...");
